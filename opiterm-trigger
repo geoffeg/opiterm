@@ -2,7 +2,7 @@
 osascript <<'END' 2>&1 >/dev/null
 tell application "iTerm2"
 	set windowId to (unique id of current session of current window)
-	create window with profile "opiterm" command "bash -l opiterm " & windowId
+	create window with profile "opiterm" command "sh opiterm " & windowId
 end tell
 END
 

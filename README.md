@@ -28,3 +28,7 @@ Usage:
 
 Caveats:
 * Only a small subset of 1Password item types will work. Right now, just logins.
+
+Todo:
+* Switch to the Python API to allow:
+    * Creating the opfzf window where the cursor was (this might be possible with apple script)
