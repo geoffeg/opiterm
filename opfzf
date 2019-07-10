@@ -123,11 +123,9 @@ main() {
   fi
 
   selected_item_name="$(echo "$items" | awk -F ',' '{ print $1 }' | fzf --no-multi)"
-	echo $selected_item_name
 
   if [[ -n "$selected_item_name" ]]; then
     selected_item_uuid="$(echo "$items" | egrep "^$selected_item_name," | awk -F ',' '{ print $2 }')"
-		echo $selected_item_uuid
 
     selected_item_password="$(get_op_item_password "$selected_item_uuid")"
 
