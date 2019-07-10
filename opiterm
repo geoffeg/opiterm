@@ -1,0 +1,22 @@
+#!/bin/bash
+password=`~/bin/opfzf`
+iTermSessionId=$1
+osascript <<END
+tell application "iTerm2"
+	repeat with aWindow in windows
+	  repeat with aTab in tabs of aWindow
+		  repeat with aSession in sessions of aTab
+			  set theSessionId to unique id of aSession
+			  if theSessionId is "$iTermSessionId" then
+					set targetSession to aSession
+					set targetTab to aTab
+					set targetWindow to aWindow
+				end if
+			end repeat
+		end repeat
+	end repeat
+	tell targetSession
+	  write text "$password"
+	end tell
+	end tell
+END

@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# The MIT License (MIT)
+
+# Copyright (c) 2017 Yarden Sod-Moriah, 2019 Geoffrey Gallaway
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+declare -r TMP_TOKEN_FILE="$HOME/.op_tmux_token_tmp"
+declare -r OPT_SUBDOMAIN="my"
+declare -r OPT_VAULT="personal"
+
+op_login() {
+  op signin "$OPT_SUBDOMAIN" --output=raw > "$TMP_TOKEN_FILE"
+	clear
+}
+
+op_get_session() {
+  cat "$TMP_TOKEN_FILE" 2> /dev/null
+}
+
+get_op_items() {
+
+  # The structure (we need) looks like the following:
+  # [
+  #   {
+  #     "uuid": "some-long-uuid",
+  #     "overview": {
+  #       "URLs": [
+  #         { "u": "sudolikeaboss://local" }
+  #       ],
+  #       "title": "Some item"
+  #     }
+  #   }
+  # ]
+
+  local -r JQ_FILTER="
+    map([ .overview.title, .uuid ]
+    | join(\",\"))
+    | .[]
+  "
+
+  op list items --vault="$OPT_VAULT" --session="$(op_get_session)" 2> /dev/null \
+    | jq "$JQ_FILTER" --raw-output
+}
+
+get_op_item_password() {
+  local -r ITEM_UUID="$1"
+
+  # There are two different kind of items that
+  # we support: login items and passwords.
+  #
+  # * Login items:
+  #       {
+  #         "details": {
+  #           "fields": [
+  #             {
+  #               "designation": "password",
+  #               "value": "supersecret"
+  #             }
+  #           ]
+  #         }
+  #       }
+  #
+  # * Password:
+  #       {
+  #         "details": {
+  #           "password": "supersecret"
+  #         }
+  #       }
+
+  local -r JQ_FILTER="
+    .details
+    | if .password and .password != \"\" then
+        .password
+      else
+        .fields[]
+        | select (.designation == \"password\")
+        | .value
+      end
+    "
+
+  op get item "$ITEM_UUID" --session="$(op_get_session)" \
+    | jq "$JQ_FILTER" --raw-output
+}
+
+# ------------------------------------------------------------------------------
+
+main() {
+  local items
+  local selected_item_name
+  local selected_item_uuid
+  local selected_item_password
+
+  items="$(get_op_items)"
+
+  if [[ -z "$items" ]]; then
+
+    # Needs to login
+    op_login
+
+    if [[ -z "$(op_get_session)" ]]; then
+      echo "1Password CLI signin has failed"
+      return 0
+    fi
+
+    items="$(get_op_items)"
+  fi
+
+  selected_item_name="$(echo "$items" | awk -F ',' '{ print $1 }' | fzf --no-multi)"
+	echo $selected_item_name
+
+  if [[ -n "$selected_item_name" ]]; then
+    selected_item_uuid="$(echo "$items" | egrep "^$selected_item_name," | awk -F ',' '{ print $2 }')"
+		echo $selected_item_uuid
+
+    selected_item_password="$(get_op_item_password "$selected_item_uuid")"
+
+    echo "$selected_item_password"
+  fi
+}
+
+main "$@"
+
