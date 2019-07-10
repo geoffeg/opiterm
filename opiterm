@@ -1,5 +1,5 @@
 #!/bin/bash
-password=`~/bin/opfzf`
+password=`opfzf`
 iTermSessionId=$1
 osascript <<END
 tell application "iTerm2"
@@ -16,7 +16,7 @@ tell application "iTerm2"
 		end repeat
 	end repeat
 	tell targetSession
-	  write text "$password"
+		write text "$password"
 	end tell
-	end tell
+end tell
 END
