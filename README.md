@@ -3,9 +3,9 @@ Opiterm is a simple way to integrate 1password with iTerm2.
 Opiterm is similar to tools such as sudolikeaboss and tmux-1password. When you need to enter a password in iTerm2, a hotkey opens a small window running op + fzf, lets you choose your password and the selected password is sent to the parent window.
 
 Requirements:
-* op
-* fzf
-* jq
+* [op](https://support.1password.com/command-line/)
+* [fzf](https://github.com/junegunn/fzf)
+* [jq](https://stedolan.github.io/jq/)
 
 Components:
 * opfzf: op + fzf. Uses fzf to help you find and choose your password. Basically a fork of Yarden Sod-Moriah's "tmux-1password" main.sh script.
