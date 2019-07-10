@@ -27,7 +27,7 @@ declare -r OPT_VAULT="personal"
 
 op_login() {
   op signin "$OPT_SUBDOMAIN" --output=raw > "$TMP_TOKEN_FILE"
-	clear
+  clear
 }
 
 op_get_session() {
@@ -41,9 +41,6 @@ get_op_items() {
   #   {
   #     "uuid": "some-long-uuid",
   #     "overview": {
-  #       "URLs": [
-  #         { "u": "sudolikeaboss://local" }
-  #       ],
   #       "title": "Some item"
   #     }
   #   }
