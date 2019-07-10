@@ -18,10 +18,10 @@ Setup:
 3. Load the provided opiterm-iterm.profile into iTerm2 to create a small window dedicated to opiterm. Be sure to call this profile "opiterm".
 4. Setup op if you haven't done that already.
 5. In your main iTerm profile, create a hotkey to launch opiterm-trigger:
-  1. Preferences -> Profiles -> Keys -> "+" to create a new key mapping
-	2. Choose a key map of your choosing.
-	3. Select "Run Coprocess"
-	4. Provide the path to wherever you stored opiterm-trigger in #2 above.
+    1. Preferences -> Profiles -> Keys -> "+" to create a new key mapping
+	  2. Choose a key map of your choosing.
+	  3. Select "Run Coprocess"
+	  4. Provide the path to wherever you stored opiterm-trigger in #2 above.
 
 Usage:
 * At a password prompt, hit the hotkey you setup above, a small window will launch. If this is the first time you've launched op today, you'll be prompted for your master password. opfzf will launch, letting you choose your password. Press enter when you've selected the correct password and the password will be sent to the opening iTerm window.
